@@ -21,3 +21,20 @@ Feature: Product catalog discovery
     When I search for "Space Tuna"
     Then I see the empty state message "No products found"
     And I am prompted to adjust the search filters
+
+  Scenario: Star rating buttons are visible on each product card
+    Given I am viewing the product catalog
+    Then each product card displays a "Rate this product:" label
+    And each card shows five blue star buttons
+
+  Scenario: Rate a product with stars
+    Given I am viewing the product catalog
+    When I click the 4th star on the first product card
+    Then the first four stars are filled blue
+    And the feedback text shows "You rated: 4 / 5 ★"
+
+  Scenario: Change an existing star rating
+    Given I have rated a product 4 stars
+    When I click the 2nd star on that product
+    Then only the first two stars are filled blue
+    And the feedback text shows "You rated: 2 / 5 ★"
