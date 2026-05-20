@@ -11,7 +11,7 @@ Perform a deep security inspection of this repository and identify potential CVE
 
 1. Find vulnerabilities with enough evidence to remediate.
 2. Create **one GitHub issue per vulnerability** using GitHub MCP tools.
-3. Assign each created issue to **Copilot** for remediation.
+3. Assign each created issue to the **Copilot account** (`copilot`) for remediation.
 4. Make each issue self-contained so a Copilot Coding Agent can implement fixes without follow-up.
 
 ## Required Workflow
@@ -20,7 +20,7 @@ Perform a deep security inspection of this repository and identify potential CVE
 
 Inspect all relevant areas that exist in the target repository:
 
-- Dependency manifests and lock files (`package.json`, `package-lock.json`, `requirements*.txt`, `pyproject.toml`, etc., only when present)
+- Dependency manifests and lock files (for example: `package.json`, `package-lock.json`, `requirements*.txt`, `pyproject.toml`) — inspect only files that are present
 - CI/CD and GitHub Actions workflows
 - API endpoints, auth flows, input validation, SQL/file/command execution paths
 - Frontend injection surfaces (XSS, unsafe HTML rendering)
@@ -50,7 +50,7 @@ Use GitHub MCP issue creation tools to open an issue for each vulnerability.
 
 - Title format: `[Security][<severity>] <short vulnerability name> in <component>`
 - Labels (if available): `security`, `vulnerability`, language/ecosystem label, and severity label
-- Assignee: `copilot` (if assignment fails because `copilot` is not assignable in this repository, document the failure and leave the issue unassigned)
+- Assignee target: `copilot` (attempt assignment; if `copilot` is not assignable in this repository, document the failure and leave the issue unassigned)
 
 ### 4) Issue body format (mandatory)
 
