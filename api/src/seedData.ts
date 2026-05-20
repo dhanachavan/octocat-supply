@@ -179,6 +179,16 @@ export const products: Product[] = [
     unit: 'piece',
     imgName: 'tracker-mat.png',
   },
+  {
+    productId: 13,
+    supplierId: 1,
+    name: 'YogiTocat Plushie',
+    description: 'plushie',
+    price: 49.99,
+    sku: '123',
+    unit: 'piece',
+    imgName: 'yogitocat-plushie.png',
+  },
 ];
 
 // Headquarters
