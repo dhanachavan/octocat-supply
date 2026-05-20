@@ -28,7 +28,10 @@ export default {
       },
       width: {
         '7/8': '87.5%'
-      }
+      },
+      dropShadow: {
+        'blue-glow': '0 0 8px rgba(59,130,246,0.85)',
+      },
     },
   },
   plugins: [],

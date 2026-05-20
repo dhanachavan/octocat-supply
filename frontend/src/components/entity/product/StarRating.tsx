@@ -6,6 +6,16 @@ interface StarRatingProps {
   onRate: (productId: number, rating: number) => void;
 }
 
+const BASE_STAR_CLASSES =
+  'w-10 h-10 flex items-center justify-center rounded-full text-[1.75rem] ' +
+  'transition-all duration-200 ease-out active:scale-90 ' +
+  'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1';
+
+const FILLED_STAR_CLASSES =
+  'text-blue-500 scale-110 hover:scale-125 hover:text-blue-400 drop-shadow-blue-glow';
+
+const EMPTY_STAR_CLASSES = 'text-gray-300 hover:scale-125 hover:text-blue-300';
+
 export default function StarRating({ productId, rating, onRate }: StarRatingProps) {
   const [hoverRating, setHoverRating] = useState(0);
   const [flashStar, setFlashStar] = useState(0);
@@ -27,6 +37,8 @@ export default function StarRating({ productId, rating, onRate }: StarRatingProp
       {[1, 2, 3, 4, 5].map((star) => {
         const isFilled = displayRating >= star;
         const isFlashing = flashStar >= star;
+        const stateClasses = isFilled ? FILLED_STAR_CLASSES : EMPTY_STAR_CLASSES;
+        const flashClass = isFlashing ? 'animate-bounce' : '';
         return (
           <button
             key={star}
@@ -36,11 +48,7 @@ export default function StarRating({ productId, rating, onRate }: StarRatingProp
             aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
             aria-pressed={rating === star}
             data-testid={`star-${productId}-${star}`}
-            className={`w-10 h-10 flex items-center justify-center rounded-full text-[1.75rem] transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 active:scale-90 ${
-              isFilled
-                ? 'text-blue-500 scale-110 hover:scale-125 hover:text-blue-400 [filter:drop-shadow(0_0_8px_rgba(59,130,246,0.85))]'
-                : 'text-gray-300 hover:scale-125 hover:text-blue-300'
-            } ${isFlashing ? 'animate-bounce' : ''}`}
+            className={`${BASE_STAR_CLASSES} ${stateClasses} ${flashClass}`}
           >
             ★
           </button>
