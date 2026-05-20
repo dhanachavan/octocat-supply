@@ -18,9 +18,9 @@ Perform a deep security inspection of this repository and identify potential CVE
 
 ### 1) Deep inspection
 
-Inspect all relevant areas:
+Inspect all relevant areas that exist in the target repository:
 
-- Dependency manifests and lock files (`package.json`, `package-lock.json`, `requirements*.txt`, `pyproject.toml`, etc.)
+- Dependency manifests and lock files (`package.json`, `package-lock.json`, `requirements*.txt`, `pyproject.toml`, etc., only when present)
 - CI/CD and GitHub Actions workflows
 - API endpoints, auth flows, input validation, SQL/file/command execution paths
 - Frontend injection surfaces (XSS, unsafe HTML rendering)
@@ -50,7 +50,7 @@ Use GitHub MCP issue creation tools to open an issue for each vulnerability.
 
 - Title format: `[Security][<severity>] <short vulnerability name> in <component>`
 - Labels (if available): `security`, `vulnerability`, language/ecosystem label, and severity label
-- Assignee: `copilot`
+- Assignee: `copilot` (if assignment fails because `copilot` is not assignable in this repository, document the failure and leave the issue unassigned)
 
 ### 4) Issue body format (mandatory)
 
@@ -114,3 +114,10 @@ After creating issues, provide:
 3. Any high-confidence findings intentionally not filed (with reason)
 
 If **no validated vulnerabilities** are found, explicitly report that and do **not** create placeholder issues.
+
+Use CVSS severity bands consistently:
+
+- **Critical:** 9.0-10.0
+- **High:** 7.0-8.9
+- **Medium:** 4.0-6.9
+- **Low:** 0.1-3.9
