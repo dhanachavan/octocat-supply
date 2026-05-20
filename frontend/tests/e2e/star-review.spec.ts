@@ -30,13 +30,13 @@ test.describe('Star review feature', () => {
 
   test('Clicking a star sets the rating and shows the score', async ({ page }) => {
     // Initially no rating score label shown for product 1
-    await expect(page.locator('[data-testid^="star-1-"]').first().locator('..')).not.toContainText('/5');
+    const ratingGroup = page.locator('[aria-label*="Rate this product"]').first();
+    await expect(ratingGroup).not.toContainText('/5');
 
     // Click the 4th star for product 1
     await page.locator('[data-testid="star-1-4"]').click();
 
     // The score label should now show 4/5
-    const ratingGroup = page.locator('[aria-label*="Rate this product"]').first();
     await expect(ratingGroup).toContainText('4/5');
   });
 
@@ -48,8 +48,8 @@ test.describe('Star review feature', () => {
     const productImage = page.locator('img[alt="SmartFeeder One"]');
     await productImage.click();
 
-    // Modal should be visible
-    const modal = page.locator('[class*="fixed inset-0"]');
+    // Modal should be visible via its data-testid
+    const modal = page.locator('[data-testid="product-modal"]');
     await expect(modal).toBeVisible();
 
     // Modal should show the same 3/5 rating

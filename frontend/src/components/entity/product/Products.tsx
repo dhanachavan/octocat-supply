@@ -279,6 +279,7 @@ export default function Products() {
           <div
             className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl transition-colors duration-300`}
             onClick={(e) => e.stopPropagation()}
+            data-testid="product-modal"
           >
             <div className="flex justify-end">
               <button

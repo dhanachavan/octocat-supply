@@ -36,27 +36,11 @@ export default function StarRating({ productId, rating, onRate }: StarRatingProp
             aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
             aria-pressed={rating === star}
             data-testid={`star-${productId}-${star}`}
-            className={[
-              'w-10 h-10 flex items-center justify-center rounded-full',
-              'transition-all duration-200 ease-out',
-              'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1',
-              'active:scale-90',
+            className={`w-10 h-10 flex items-center justify-center rounded-full text-[1.75rem] transition-all duration-200 ease-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 active:scale-90 ${
               isFilled
-                ? 'text-blue-500 scale-110 hover:scale-125 hover:text-blue-400'
-                : 'text-gray-300 hover:scale-125 hover:text-blue-300',
-              isFlashing ? 'animate-bounce' : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-            style={{
-              fontSize: '1.75rem',
-              filter: isFilled
-                ? 'drop-shadow(0 0 8px rgba(59,130,246,0.85))'
-                : undefined,
-              textShadow: isFlashing
-                ? '0 0 12px rgba(59,130,246,1)'
-                : undefined,
-            }}
+                ? 'text-blue-500 scale-110 hover:scale-125 hover:text-blue-400 [filter:drop-shadow(0_0_8px_rgba(59,130,246,0.85))]'
+                : 'text-gray-300 hover:scale-125 hover:text-blue-300'
+            } ${isFlashing ? 'animate-bounce' : ''}`}
           >
             ★
           </button>
