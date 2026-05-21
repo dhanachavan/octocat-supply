@@ -23,6 +23,7 @@ const fetchProducts = async (): Promise<Product[]> => {
 
 export default function Products() {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
+  const [ratings, setRatings] = useState<Record<number, number>>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -59,6 +60,13 @@ export default function Products() {
         [productId]: 0,
       }));
     }
+  };
+
+  const handleRatingChange = (productId: number, rating: number) => {
+    setRatings((prev) => ({
+      ...prev,
+      [productId]: rating,
+    }));
   };
 
   const handleProductClick = (product: Product) => {
@@ -189,8 +197,35 @@ export default function Products() {
                   >
                     {product.description}
                   </p>
-                  <div className="space-y-4 mt-auto">
-                    <div className="flex justify-between items-center">
+                    <div className="space-y-4 mt-auto">
+                      <div className="space-y-2">
+                        <p
+                          className={`text-sm font-semibold ${darkMode ? 'text-blue-300' : 'text-blue-700'} transition-colors duration-300`}
+                        >
+                          Star Review
+                        </p>
+                        <div className="flex items-center gap-2" role="group" aria-label={`Star review for ${product.name}`}>
+                          {[1, 2, 3, 4, 5].map((rating) => {
+                            const isSelected = (ratings[product.productId] || 0) >= rating;
+                            return (
+                              <button
+                                key={`${product.productId}-star-${rating}`}
+                                type="button"
+                                onClick={() => handleRatingChange(product.productId, rating)}
+                                className={`h-10 w-10 rounded-full text-xl font-bold leading-none transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:ring-offset-2 ${isSelected ? 'bg-blue-600 text-white shadow-[0_0_14px_rgba(37,99,235,0.9)] scale-110' : `${darkMode ? 'bg-blue-900/50 text-blue-200 hover:bg-blue-700' : 'bg-blue-100 text-blue-700 hover:bg-blue-500 hover:text-white'} hover:scale-105 hover:shadow-[0_0_12px_rgba(59,130,246,0.65)]`}`}
+                                aria-label={`Rate ${product.name} with ${rating} star${rating > 1 ? 's' : ''}`}
+                                aria-pressed={isSelected}
+                              >
+                                ★
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <p className={`${darkMode ? 'text-blue-200' : 'text-blue-700'} text-xs`}>
+                          Current rating: {ratings[product.productId] || 0}/5
+                        </p>
+                      </div>
+                      <div className="flex justify-between items-center">
                       {hasDiscount ? (
                         <div>
                           <span className="text-gray-500 line-through text-sm mr-2">

@@ -8,6 +8,7 @@ import { test, expect } from '@playwright/test';
  * - Navigation from home page to product catalog
  * - Product search with valid matches
  * - Product search with no matches (empty state)
+ * - Product star review interaction
  */
 
 test.describe('Product catalog discovery', () => {
@@ -72,5 +73,33 @@ test.describe('Product catalog discovery', () => {
 
     // And I am prompted to adjust the search filters
     await expect(emptyState).toContainText(/clearing.*changing.*search filters/i);
+  });
+
+  test('Set a star review on a product', async ({ page }) => {
+    // Given I am viewing the product catalog
+    await page.goto('/products');
+    await expect(page.locator('h1:has-text("Products")')).toBeVisible();
+
+    // When I set a 4-star review for SmartFeeder One
+    const productCard = page.locator('div[class*="rounded-lg"]').filter({ hasText: 'SmartFeeder One' }).first();
+    const fourthStar = productCard.getByRole('button', {
+      name: /Rate SmartFeeder One with 4 stars/i,
+    });
+    await fourthStar.click();
+
+    // Then the selected stars are highlighted up to 4
+    await expect(
+      productCard.getByRole('button', {
+        name: /Rate SmartFeeder One with 4 stars/i,
+      }),
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      productCard.getByRole('button', {
+        name: /Rate SmartFeeder One with 5 stars/i,
+      }),
+    ).toHaveAttribute('aria-pressed', 'false');
+
+    // And I see the current rating text update
+    await expect(productCard).toContainText('Current rating: 4/5');
   });
 });

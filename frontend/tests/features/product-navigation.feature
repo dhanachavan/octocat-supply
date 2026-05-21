@@ -21,3 +21,9 @@ Feature: Product catalog discovery
     When I search for "Space Tuna"
     Then I see the empty state message "No products found"
     And I am prompted to adjust the search filters
+
+  Scenario: Set a star review on a product
+    Given I am viewing the product catalog
+    When I set a 4-star review for "SmartFeeder One"
+    Then the selected stars are highlighted up to 4
+    And I see the rating text "Current rating: 4/5"
