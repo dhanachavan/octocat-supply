@@ -55,7 +55,7 @@ export interface DiscountCode {
   discountCodeId: number;
   code: string;
   description: string;
-  discountType: string;
+  discountType: 'percentage' | 'fixed';
   discountValue: number;
   minimumOrderAmount: number;
   isActive: boolean;

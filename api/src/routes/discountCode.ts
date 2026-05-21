@@ -179,7 +179,7 @@ router.post('/validate', async (req, res, next) => {
   try {
     const { code, orderAmount } = req.body as { code: string; orderAmount: number };
 
-    if (!code || orderAmount === undefined || orderAmount === null) {
+    if (!code || code.trim() === '' || orderAmount === undefined || orderAmount === null) {
       res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: 'code and orderAmount are required' } });
       return;
     }
