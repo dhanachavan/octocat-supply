@@ -213,7 +213,7 @@ export default function Products() {
                               type="button"
                               onClick={() => handleRatingChange(product.productId, star)}
                               className={`w-10 h-10 rounded-full border-2 text-xl font-bold transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'} focus:ring-offset-2 ${isSelected
-                                ? 'bg-blue-500 border-blue-300 text-white shadow-[0_0_14px_rgba(59,130,246,0.85)] animate-pulse'
+                                ? 'bg-blue-500 border-blue-300 text-white shadow-[0_0_14px_rgba(59,130,246,0.85)] motion-safe:animate-pulse'
                                 : 'bg-blue-100 border-blue-300 text-blue-600 hover:bg-blue-300 hover:shadow-[0_0_10px_rgba(59,130,246,0.5)]'
                                 }`}
                               aria-label={`Rate ${product.name} ${star} ${star === 1 ? 'star' : 'stars'}`}
