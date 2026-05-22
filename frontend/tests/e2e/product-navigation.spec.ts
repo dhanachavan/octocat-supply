@@ -73,4 +73,41 @@ test.describe('Product catalog discovery', () => {
     // And I am prompted to adjust the search filters
     await expect(emptyState).toContainText(/clearing.*changing.*search filters/i);
   });
+
+  test('View product details and add to cart from the modal', async ({ page }) => {
+    // Given I am viewing the product catalog
+    await page.goto('/products');
+    await expect(page.locator('h1:has-text("Products")')).toBeVisible();
+
+    // When I open the SmartFeeder One product details
+    await page.locator('img[alt="SmartFeeder One"]').first().click();
+
+    // Then I see the enriched product details in the modal
+    const modal = page.locator('[role="dialog"]');
+    await expect(modal).toBeVisible();
+    await expect(modal.locator('h2:has-text("SmartFeeder One")')).toBeVisible();
+    await expect(modal).toContainText('SKU: CAT-FEED-001');
+    await expect(modal).toContainText('Unit: piece');
+    await expect(modal).toContainText('25% OFF');
+    await expect(modal).toContainText('$129.99');
+    await expect(modal).toContainText('$97.49');
+
+    // And the modal quantity is independent from the product card quantity
+    const modalQuantity = modal.locator(
+      'span[aria-label="Quantity of SmartFeeder One in product details"]',
+    );
+    await expect(page.locator('#qty-1')).toHaveText('0');
+    await page.getByLabel('Increase quantity of SmartFeeder One in product details').click();
+    await page.getByLabel('Increase quantity of SmartFeeder One in product details').click();
+    await expect(modalQuantity).toHaveText('2');
+    await expect(page.locator('#qty-1')).toHaveText('0');
+
+    // When I add the modal selection to the cart
+    await modal.getByRole('button', { name: 'Add to Cart' }).click();
+
+    // Then I receive a non-blocking confirmation and the modal quantity resets
+    await expect(page.locator('[role="status"]').first()).toContainText('Added 2 items to cart');
+    await expect(modalQuantity).toHaveText('0');
+    await expect(page.locator('#qty-1')).toHaveText('0');
+  });
 });

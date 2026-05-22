@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useQuery } from 'react-query';
 import { api } from '../../../api/config';
@@ -25,7 +25,9 @@ export default function Products() {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProductQuantity, setSelectedProductQuantity] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
   const { data: products, isLoading, error } = useQuery('products', fetchProducts);
   const { darkMode } = useTheme();
 
@@ -35,13 +37,6 @@ export default function Products() {
       product.description.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
-  // Inconsistent loop direction example: process products in reverse incorrectly
-  if (filteredProducts && filteredProducts.length === 0) {
-    for (let i = filteredProducts.length - 1; i > 5; ++i) {
-      filteredProducts[i].discount = 0;
-    }
-  }
-
   const handleQuantityChange = (productId: number, change: number) => {
     setQuantities((prev) => ({
       ...prev,
@@ -49,11 +44,19 @@ export default function Products() {
     }));
   };
 
-  const handleAddToCart = (productId: number) => {
-    const quantity = quantities[productId] || 0;
+  const handleAddToCart = (
+    productId: number,
+    quantity = quantities[productId] || 0,
+    resetQuantity?: () => void,
+  ) => {
     if (quantity > 0) {
       // TODO: Implement cart functionality
-      alert(`Added ${quantity} items to cart`);
+      setCartMessage(`Added ${quantity} item${quantity === 1 ? '' : 's'} to cart`);
+      if (resetQuantity) {
+        resetQuantity();
+        return;
+      }
+
       setQuantities((prev) => ({
         ...prev,
         [productId]: 0,
@@ -61,10 +64,29 @@ export default function Products() {
     }
   };
 
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedProduct(null);
+    setSelectedProductQuantity(0);
+  };
+
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
+    setSelectedProductQuantity(0);
     setShowModal(true);
   };
+
+  useEffect(() => {
+    if (!cartMessage) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setCartMessage(null);
+    }, 3000);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [cartMessage]);
 
   if (isLoading) {
     return (
@@ -96,6 +118,17 @@ export default function Products() {
     <div
       className={`min-h-screen ${darkMode ? 'bg-dark' : 'bg-gray-100'} pt-20 pb-16 px-4 transition-colors duration-300`}
     >
+      {cartMessage && (
+        <div className="fixed top-24 left-1/2 z-50 w-full max-w-md -translate-x-1/2 px-4">
+          <div
+            className={`rounded-lg border px-4 py-3 shadow-lg ${darkMode ? 'border-primary/40 bg-gray-800 text-light' : 'border-primary/20 bg-white text-gray-800'}`}
+            role="status"
+            aria-live="polite"
+          >
+            {cartMessage}
+          </div>
+        </div>
+      )}
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col space-y-6">
           <h1
@@ -157,6 +190,7 @@ export default function Products() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts?.map((product) => {
               const hasDiscount = product.discount != null && product.discount > 0;
+              const discountedPrice = hasDiscount ? product.price * (1 - product.discount!) : product.price;
               return (
                 <div
                   key={product.productId}
@@ -197,7 +231,7 @@ export default function Products() {
                             ${product.price.toFixed(2)}
                           </span>
                           <span className="text-primary text-xl font-bold">
-                            ${(product.price * (1 - product.discount!)).toFixed(2)}
+                            ${discountedPrice.toFixed(2)}
                           </span>
                         </div>
                       ) : (
@@ -261,16 +295,20 @@ export default function Products() {
       {showModal && selectedProduct && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-          onClick={() => setShowModal(false)}
+          onClick={handleCloseModal}
         >
           <div
             className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-xl transition-colors duration-300`}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="product-modal-title"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-end">
               <button
-                onClick={() => setShowModal(false)}
+                onClick={handleCloseModal}
                 className={`${darkMode ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'} transition-colors duration-300`}
+                aria-label="Close product details"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
@@ -292,6 +330,7 @@ export default function Products() {
               />
             </div>
             <h2
+              id="product-modal-title"
               className={`text-2xl font-bold ${darkMode ? 'text-light' : 'text-gray-800'} mb-4 transition-colors duration-300`}
             >
               {selectedProduct.name}
@@ -301,6 +340,77 @@ export default function Products() {
             >
               {selectedProduct.description}
             </p>
+            <div className="mt-6 space-y-6">
+              <div className="flex flex-wrap items-center gap-3">
+                {selectedProduct.discount != null && selectedProduct.discount > 0 ? (
+                  <>
+                    <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'} text-lg line-through`}>
+                      ${selectedProduct.price.toFixed(2)}
+                    </span>
+                    <span className="text-primary text-3xl font-bold">
+                      ${(selectedProduct.price * (1 - selectedProduct.discount)).toFixed(2)}
+                    </span>
+                    <span className="rounded-full bg-primary px-3 py-1 text-sm font-semibold text-white">
+                      {Math.round(selectedProduct.discount * 100)}% OFF
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-primary text-3xl font-bold">
+                    ${selectedProduct.price.toFixed(2)}
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <p className={`${darkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-300`}>
+                  <span className="font-semibold">SKU:</span> {selectedProduct.sku}
+                </p>
+                <p className={`${darkMode ? 'text-gray-300' : 'text-gray-700'} transition-colors duration-300`}>
+                  <span className="font-semibold">Unit:</span> {selectedProduct.unit}
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div
+                  className={`flex items-center space-x-3 ${darkMode ? 'bg-gray-700' : 'bg-gray-200'} rounded-lg p-1 transition-colors duration-300`}
+                >
+                  <button
+                    onClick={() => setSelectedProductQuantity((prev) => Math.max(0, prev - 1))}
+                    className={`w-8 h-8 flex items-center justify-center ${darkMode ? 'text-light' : 'text-gray-700'} hover:text-primary transition-colors duration-300`}
+                    aria-label={`Decrease quantity of ${selectedProduct.name} in product details`}
+                  >
+                    <span aria-hidden="true">-</span>
+                  </button>
+                  <span
+                    className={`${darkMode ? 'text-light' : 'text-gray-800'} min-w-[2rem] text-center transition-colors duration-300`}
+                    aria-label={`Quantity of ${selectedProduct.name} in product details`}
+                  >
+                    {selectedProductQuantity}
+                  </span>
+                  <button
+                    onClick={() => setSelectedProductQuantity((prev) => prev + 1)}
+                    className={`w-8 h-8 flex items-center justify-center ${darkMode ? 'text-light' : 'text-gray-700'} hover:text-primary transition-colors duration-300`}
+                    aria-label={`Increase quantity of ${selectedProduct.name} in product details`}
+                  >
+                    <span aria-hidden="true">+</span>
+                  </button>
+                </div>
+                <button
+                  onClick={() =>
+                    handleAddToCart(selectedProduct.productId, selectedProductQuantity, () =>
+                      setSelectedProductQuantity(0),
+                    )
+                  }
+                  className={`px-4 py-2 rounded-lg transition-colors ${selectedProductQuantity
+                    ? 'bg-primary hover:bg-accent text-white'
+                    : `${darkMode ? 'bg-gray-700 text-gray-400' : 'bg-gray-200 text-gray-500'} cursor-not-allowed`
+                    }`}
+                  disabled={!selectedProductQuantity}
+                >
+                  Add to Cart
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
