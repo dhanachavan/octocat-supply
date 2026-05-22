@@ -21,6 +21,8 @@ const fetchProducts = async (): Promise<Product[]> => {
   return data;
 };
 
+const getDiscountedPrice = (product: Product) => product.price * (1 - (product.discount ?? 0));
+
 export default function Products() {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [searchTerm, setSearchTerm] = useState('');
@@ -190,7 +192,7 @@ export default function Products() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts?.map((product) => {
               const hasDiscount = product.discount != null && product.discount > 0;
-              const discountedPrice = hasDiscount ? product.price * (1 - product.discount!) : product.price;
+              const discountedPrice = getDiscountedPrice(product);
               return (
                 <div
                   key={product.productId}
@@ -348,7 +350,7 @@ export default function Products() {
                       ${selectedProduct.price.toFixed(2)}
                     </span>
                     <span className="text-primary text-3xl font-bold">
-                      ${(selectedProduct.price * (1 - selectedProduct.discount)).toFixed(2)}
+                      ${getDiscountedPrice(selectedProduct).toFixed(2)}
                     </span>
                     <span className="rounded-full bg-primary px-3 py-1 text-sm font-semibold text-white">
                       {Math.round(selectedProduct.discount * 100)}% OFF
