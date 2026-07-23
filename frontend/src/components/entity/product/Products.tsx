@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useQuery } from 'react-query';
 import { api } from '../../../api/config';
 import { useTheme } from '../../../context/ThemeContext';
+import StarRating from './StarRating';
 
 interface Product {
   productId: number;
@@ -185,10 +186,13 @@ export default function Products() {
                     {product.name}
                   </h3>
                   <p
-                    className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-4 flex-grow transition-colors duration-300`}
+                    className={`${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-3 flex-grow transition-colors duration-300`}
                   >
                     {product.description}
                   </p>
+                  <div className="mb-3">
+                    <StarRating productId={product.productId} productName={product.name} />
+                  </div>
                   <div className="space-y-4 mt-auto">
                     <div className="flex justify-between items-center">
                       {hasDiscount ? (
@@ -297,10 +301,18 @@ export default function Products() {
               {selectedProduct.name}
             </h2>
             <p
-              className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} text-lg transition-colors duration-300`}
+              className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} text-lg mb-6 transition-colors duration-300`}
             >
               {selectedProduct.description}
             </p>
+            <div>
+              <h3
+                className={`text-sm font-semibold uppercase tracking-wide mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+              >
+                Your Rating
+              </h3>
+              <StarRating productId={selectedProduct.productId} productName={selectedProduct.name} />
+            </div>
           </div>
         </div>
       )}
