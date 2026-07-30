@@ -73,4 +73,27 @@ test.describe('Product catalog discovery', () => {
     // And I am prompted to adjust the search filters
     await expect(emptyState).toContainText(/clearing.*changing.*search filters/i);
   });
+
+  test('Select a star review for a product', async ({ page }) => {
+    await page.goto('/products');
+    await expect(page.locator('h1:has-text("Products")')).toBeVisible();
+
+    await page.screenshot({
+      path: 'tests/evidence/star-review-before-selection.png',
+      fullPage: true,
+    });
+
+    const fiveStarButton = page.locator('button[id^="star-rating-"][id$="-5"]').first();
+    await expect(fiveStarButton).toBeVisible();
+
+    await fiveStarButton.click();
+
+    await expect(fiveStarButton).toHaveAttribute('aria-pressed', 'true');
+    await expect(fiveStarButton).toHaveClass(/bg-blue-500/);
+
+    await page.screenshot({
+      path: 'tests/evidence/star-review-after-selection.png',
+      fullPage: true,
+    });
+  });
 });

@@ -24,6 +24,7 @@ const fetchProducts = async (): Promise<Product[]> => {
 
 export default function Products() {
   const [quantities, setQuantities] = useState<Record<number, number>>({});
+  const [ratings, setRatings] = useState<Record<number, number>>({});
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -65,6 +66,13 @@ export default function Products() {
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
     setShowModal(true);
+  };
+
+  const handleRatingChange = (productId: number, rating: number) => {
+    setRatings((prev) => ({
+      ...prev,
+      [productId]: rating,
+    }));
   };
 
   if (isLoading) {
@@ -194,6 +202,34 @@ export default function Products() {
                     <StarRating productId={product.productId} productName={product.name} />
                   </div>
                   <div className="space-y-4 mt-auto">
+                    <div>
+                      <p
+                        className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2 transition-colors duration-300`}
+                      >
+                        Rate this product
+                      </p>
+                      <div className="flex items-center gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => {
+                          const isSelected = (ratings[product.productId] || 0) >= star;
+                          return (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => handleRatingChange(product.productId, star)}
+                              className={`w-10 h-10 rounded-full border-2 text-xl font-bold transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-400 ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'} focus:ring-offset-2 ${isSelected
+                                ? 'bg-blue-500 border-blue-300 text-white shadow-[0_0_14px_rgba(59,130,246,0.85)] motion-safe:animate-pulse'
+                                : 'bg-blue-100 border-blue-300 text-blue-600 hover:bg-blue-300 hover:shadow-[0_0_10px_rgba(59,130,246,0.5)]'
+                                }`}
+                              aria-label={`Rate ${product.name} ${star} ${star === 1 ? 'star' : 'stars'}`}
+                              aria-pressed={isSelected}
+                              id={`star-rating-${product.productId}-${star}`}
+                            >
+                              <span aria-hidden="true">★</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                     <div className="flex justify-between items-center">
                       {hasDiscount ? (
                         <div>

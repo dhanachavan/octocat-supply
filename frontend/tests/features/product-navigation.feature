@@ -21,3 +21,8 @@ Feature: Product catalog discovery
     When I search for "Space Tuna"
     Then I see the empty state message "No products found"
     And I am prompted to adjust the search filters
+
+  Scenario: Add a star review on the product card
+    Given I am viewing the product catalog
+    When I select a 5-star rating for a product
+    Then the selected star buttons are highlighted in blue
