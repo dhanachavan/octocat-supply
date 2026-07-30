@@ -32,6 +32,32 @@ When generating suggestions:
 - Keep PRs scoped: code + tests + docs (architecture or build notes) when behavior changes.
 - Update related instruction files if new folders or architectural slices are introduced.
 
+## Language-Specific Best Practices
+
+### TypeScript (api/, frontend/)
+- Follow the W3Schools TypeScript best-practice baseline for consistency: https://www.w3schools.com/typescript/typescript_best_practices.php
+- Prefer explicit types for function params/returns and exported values; rely on inference for obvious local variables.
+- Use `interface`/`type` for data contracts and DTOs; avoid `any` unless there is a clear, documented reason.
+- Prefer `const` by default; use `readonly` for fields that must not be reassigned after creation.
+- Keep strict compiler behavior enabled (`strict`, `noImplicitAny`, `strictNullChecks`) and fix type drift instead of suppressing errors.
+- Use enums or string-literal unions for finite state sets (status values, workflow states) instead of free-form strings.
+
+### SQL (api/database/migrations, api/database/seed)
+- Add forward-only sequential migrations; never rewrite historical migration files that may already be applied.
+- Keep schema constraints close to the data (`NOT NULL`, `CHECK`, FK rules) and add indexes for foreign keys and frequent filters.
+- Prefer deterministic seed data for demo/test stability and update seeds whenever required columns change.
+- In application code, always parameterize SQL and never concatenate user input into query text.
+
+### Shell (demo/resources, .github/hooks, frontend/entrypoint.sh)
+- Write scripts to be safe in CI/non-interactive environments (`set -euo pipefail` when compatible).
+- Quote variable expansions and paths to avoid word-splitting/globbing bugs.
+- Keep scripts idempotent where practical and return non-zero exit codes for failure paths.
+
+### Bicep / Infrastructure as Code (infra/)
+- Keep infrastructure values parameterized and environment-driven; avoid hard-coded secrets or environment-specific IDs.
+- Prefer modular, composable resources and clear outputs for downstream deployment/workflow steps.
+- Validate and review IaC changes with security in mind (least-privilege access, explicit networking/public exposure decisions).
+
 ## Do Not Repeat
 Do not inline full API route or component files in review feedback unless absolutely necessary: quote only the lines requiring change. Summarize low‑impact nits.
 
